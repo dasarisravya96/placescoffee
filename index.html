@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Coffee Shop Recommendations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: white;
+            color: black;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid black;
+        }
+
+        header h1 {
+            font-size: 2em;
+            font-weight: 400;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            font-size: 0.95em;
+            color: #666;
+            font-weight: 300;
+        }
+
+        .filter-section {
+            margin-bottom: 50px;
+        }
+
+        .filter-section h2 {
+            font-size: 0.85em;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border: 1px solid black;
+            background: white;
+            color: black;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+            font-weight: 400;
+        }
+
+        .filter-btn:hover {
+            background: black;
+            color: white;
+        }
+
+        .filter-btn.active {
+            background: black;
+            color: white;
+        }
+
+        .shops-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1px;
+            background: black;
+            border: 1px solid black;
+        }
+
+        .shop-card {
+            background: white;
+            padding: 30px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .shop-card:hover {
+            background: #f5f5f5;
+        }
+
+        .shop-header {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .shop-name {
+            font-size: 1.3em;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .shop-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .shop-rating {
+            font-weight: 500;
+            color: black;
+        }
+
+        .shop-description {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .shop-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            border: 1px solid #e0e0e0;
+            padding: 4px 12px;
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .shop-highlights {
+            display: flex;
+            gap: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .add-shop-btn {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 56px;
+            height: 56px;
+            border: 2px solid black;
+            background: white;
+            color: black;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .add-shop-btn:hover {
+            background: black;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 50px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid black;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 30px;
+            font-weight: 500;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid black;
+            background: white;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border: 2px solid black;
+            padding: 11px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: 1px solid black;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: black;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #333;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: black;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            color: #666;
+        }
+
+        .no-results h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: black;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 30px 15px;
+            }
+
+            header {
+                margin-bottom: 40px;
+                padding-bottom: 30px;
+            }
+
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            .shops-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-buttons {
+                justify-content: flex-start;
+            }
+
+            .modal-content {
+                padding: 30px;
+            }
+
+            .add-shop-btn {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Community Coffee Shops</h1>
+            <p>Discover and share your favorite local coffee spots</p>
+        </header>
+
+        <div class="filter-section">
+            <h2>Filter by vibe</h2>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="cozy">Cozy</button>
+                <button class="filter-btn" data-filter="modern">Modern</button>
+                <button class="filter-btn" data-filter="rustic">Rustic</button>
+                <button class="filter-btn" data-filter="quiet">Quiet</button>
+                <button class="filter-btn" data-filter="social">Social</button>
+            </div>
+        </div>
+
+        <div class="shops-grid" id="shopsGrid">
+            <!-- Coffee shops will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <button class="add-shop-btn" id="addShopBtn" title="Add a coffee shop">+</button>
+
+    <div class="modal" id="addShopModal">
+        <div class="modal-content">
+            <h2>Add a Coffee Shop</h2>
+            <form id="addShopForm">
+                <div class="form-group">
+                    <label for="shopName">Shop Name</label>
+                    <input type="text" id="shopName" required>
+                </div>
+                <div class="form-group">
+                    <label for="shopLocation">Location</label>
+                    <input type="text" id="shopLocation" required>
+                </div>
+                <div class="form-group">
+                    <label for="shopRating">Rating (1-5)</label>
+                    <input type="number" id="shopRating" min="1" max="5" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="shopVibe">Vibe</label>
+                    <select id="shopVibe" required>
+                        <option value="">Select a vibe</option>
+                        <option value="cozy">Cozy</option>
+                        <option value="modern">Modern</option>
+                        <option value="rustic">Rustic</option>
+                        <option value="quiet">Quiet</option>
+                        <option value="social">Social</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="shopDescription">Description</label>
+                    <textarea id="shopDescription" required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Shop</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample coffee shop data
+        let coffeeShops = [
+            {
+                name: "The Cozy Corner",
+                location: "123 Main St, Downtown",
+                rating: 4.8,
+                description: "A warm, inviting space with vintage armchairs and a fireplace. Perfect for reading or catching up with friends over expertly crafted lattes.",
+                vibe: "cozy",
+                tags: ["Free WiFi", "Outdoor Seating", "Pastries"],
+                wifi: true,
+                parking: true
+            },
+            {
+                name: "Brew & Beans",
+                location: "456 Oak Avenue, Midtown",
+                rating: 4.6,
+                description: "Sleek minimalist design meets exceptional coffee. Known for their pour-overs and single-origin selections. Great for remote work.",
+                vibe: "modern",
+                tags: ["Specialty Coffee", "Quiet", "Power Outlets"],
+                wifi: true,
+                parking: false
+            },
+            {
+                name: "Rustic Roasters",
+                location: "789 Pine Road, Old Town",
+                rating: 4.9,
+                description: "Housed in a converted barn with exposed brick and reclaimed wood. They roast their own beans on-site and the aroma is incredible.",
+                vibe: "rustic",
+                tags: ["House Roasted", "Organic", "Live Music"],
+                wifi: true,
+                parking: true
+            },
+            {
+                name: "Quiet Grounds",
+                location: "321 Elm Street, Westside",
+                rating: 4.7,
+                description: "A tranquil oasis for those who want to focus. Soft music, comfortable seating, and a strict no-phone-calls policy make this ideal for studying.",
+                vibe: "quiet",
+                tags: ["Study Friendly", "Free WiFi", "Vegan Options"],
+                wifi: true,
+                parking: true
+            },
+            {
+                name: "Social Sips",
+                location: "555 Broadway, Arts District",
+                rating: 4.5,
+                description: "Bustling community hub with communal tables and regular events. Great for meeting new people and trying experimental drinks.",
+                vibe: "social",
+                tags: ["Events", "Community Board", "Board Games"],
+                wifi: true,
+                parking: false
+            },
+            {
+                name: "Morning Glory Café",
+                location: "888 Sunrise Blvd, East End",
+                rating: 4.8,
+                description: "Famous for their breakfast menu and sunrise views. The outdoor patio is perfect for morning coffee and fresh croissants.",
+                vibe: "cozy",
+                tags: ["Breakfast", "Outdoor Seating", "Bakery"],
+                wifi: false,
+                parking: true
+            }
+        ];
+
+        let currentFilter = 'all';
+
+        // Render shops
+        function renderShops() {
+            const grid = document.getElementById('shopsGrid');
+            const filteredShops = currentFilter === 'all' 
+                ? coffeeShops 
+                : coffeeShops.filter(shop => shop.vibe === currentFilter);
+
+            if (filteredShops.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-results">
+                        <h3>No coffee shops found</h3>
+                        <p>Try a different filter or add your own recommendation</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filteredShops.map(shop => `
+                <div class="shop-card">
+                    <div class="shop-header">
+                        <div class="shop-name">${shop.name}</div>
+                        <div class="shop-meta">
+                            <span>${shop.location}</span>
+                            <span class="shop-rating">${shop.rating}</span>
+                        </div>
+                    </div>
+                    <div class="shop-description">${shop.description}</div>
+                    <div class="shop-tags">
+                        ${shop.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    <div class="shop-highlights">
+                        ${shop.wifi ? '<div>WiFi</div>' : ''}
+                        ${shop.parking ? '<div>Parking</div>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderShops();
+            });
+        });
+
+        // Modal functionality
+        const modal = document.getElementById('addShopModal');
+        const addShopBtn = document.getElementById('addShopBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const form = document.getElementById('addShopForm');
+
+        addShopBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+            form.reset();
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+                form.reset();
+            }
+        });
+
+        // Form submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const newShop = {
+                name: document.getElementById('shopName').value,
+                location: document.getElementById('shopLocation').value,
+                rating: parseFloat(document.getElementById('shopRating').value),
+                vibe: document.getElementById('shopVibe').value,
+                description: document.getElementById('shopDescription').value,
+                tags: ['Community Added'],
+                wifi: true,
+                parking: true
+            };
+
+            coffeeShops.unshift(newShop);
+            renderShops();
+            modal.classList.remove('active');
+            form.reset();
+        });
+
+        // Initial render
+        renderShops();
+    </script>
+</body>
+</html>
